@@ -1,0 +1,77 @@
+﻿extends layout
+
+block morescripts
+    script(type="text/javascript", src="/javascripts/public.client.js")
+
+block content
+    .container-fluid
+
+        .form(method='POST', id="form")
+            h1.display-4.m-b-2 TAP Provisioning Requests - Ring 1.5 Users
+            p Enter your tenant's information here.
+            label(for="company") Company Name
+            input.company.form-control(type='text', placeholder='Company Name' name='company' autocomplete='off' style="width: 400px" required)
+            label(for="tenantId") Tenant ID
+            input.tenantId.form-control#tenantIdField(type='text', placeholder="TenantID" name="tenantId" autocomplete="off" style="width: 400px" required  pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
+            br
+            
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title
+                        a(data-toggle="collapse" href="#collapse1")#getItAdmins View the IT admins already provisioned in this tenant
+                #collapse1.panel-collapse.collapse
+                    .panel-body
+                        ul#admins
+            
+            br
+            .panel.panel-default
+                .panel-heading
+                    h4.panel-title 
+                        a(data-toggle="collapse" href="#collapse2") View steps to get a user's Object ID
+                #collapse2.panel-collapse.collapse
+                    .panel-body
+                        p Launch Remote Powershell and connect to your tenant
+                        pre $User = Get-Credential (enter your Tenant Admin credentials)
+                        pre Connect-MsOlService -Credential $User
+                        p Get the ObjectId of the user's account
+                        pre Get-MsOlUser -UserPrincipalName {username@domain.onmicrosoft.com} | fl UserPrincipalName,ObjectId
+            p Enter the details of the user you want to be provisioned/de-provisioned in Ring 1.5 (IT Ring) on the next provisioning date.
+            p Rather than typing each one in, you can copy several entries and paste them directly into this form. You can copy multiple columns and rows from a spreadsheet, too.
+            .alert.alert-warning#limitText(style="display: none") 
+                p You can only submit up to 10 requests.
+            table.table.table-striped.table-bordered#form-table
+                thead
+                    tr
+                        td #[strong Add/Remove]
+                        td #[strong User's Name]
+                        td #[strong Email]
+                        td #[strong ObjectID]
+                        td #[strong Category]
+                        td    
+                tbody
+                    tr.form-row
+                        td
+                            select.addRemove.form-control(name="addRemove")
+                                option(value="Add") Add
+                                option(value="Remove") Remove
+                        td
+                            input.name.form-control(type='text', placeholder='Name' name='name' required)
+                        td
+                            input.email.form-control(type='email', placeholder='name@domain.com' name='email' required)
+                        td
+                            input.objectId.form-control(type='text', placeholder='ObjectID' name='objectId' title="Please enter a valid ObjectID." required pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
+                        td
+                            input.category.form-control(name='category', list='category-list' required)
+                            datalist#category-list
+                                option(value="IT Admin")
+                                option(value="Room Account")
+                                option(value="Device Account")
+                                option(value="Super User")
+                                option(value="Elite User")
+                        td
+                            span.glyphicon.glyphicon-plus.adder
+        .alert.alert-success(style="display: none")
+            p Your requests were submitted! You will receive a confirmation email.
+
+        .btn-container
+            button.btn.btn-teams#submitForm(type='submit' disabled) Submit

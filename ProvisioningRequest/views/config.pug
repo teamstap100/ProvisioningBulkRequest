@@ -1,0 +1,23 @@
+﻿extends layout.pug
+
+block morescripts
+  script(src='https://unpkg.com/@microsoft/teams-js@1.3.7/dist/MicrosoftTeams.min.js', integrity='sha384-glExfvkpce98dO2oN+diZ/Luv/5qrZJiOvWCeR8ng/ZxlhpvBgHKeVFRURrh+NEC', crossorigin='anonymous')
+  script(type="text/javascript", src="/javascripts/configController.client.js")
+
+
+block content
+  .container
+    br
+    p.clementine-text Which provisioning form?
+    form
+        ul
+            li
+                input.formSelect(type='radio', name='formSelect', id="Public", value= "Public", onclick='microsoftTeams.settings.setValidityState(true);')
+                label(for="Pubic")   Public (R1.5)
+            li
+                input.formSelect(type='radio', name='formSelect', id="Public", value= "R3", onclick='microsoftTeams.settings.setValidityState(true);')
+                label(for="Pubic")   Public (R3)
+            li
+                input.formSelect(type='radio', name='formSelect', id="Internal", value= "Internal", onclick='microsoftTeams.settings.setValidityState(true);')
+                label(for="Internal")   Internal
+        br

@@ -1,0 +1,86 @@
+﻿extends layout
+
+block morescripts
+    script(type="text/javascript", src="/javascripts/internal.client.js")
+
+block content
+    .container-fluid
+        .form(method='POST', id="form")
+            h1.display-4.m-b-2 TAP Provisioning Requests - Internal
+            br
+            h3 Users
+            table.table.table-striped.table-bordered#user-table
+                thead
+                    tr
+                        td #[strong Add/Remove]
+                        td(style="width: 100px") #[strong Ring]
+                        td #[strong Company]
+                        td #[strong TenantID]
+                        td #[strong User's Name]
+                        td #[strong Email]
+                        td #[strong ObjectID]
+                        td #[strong Category]
+                        td    
+                tbody
+                    tr.form-row
+                        td
+                            input.addRemove.form-control(type="text", name="addRemove", pattern='(Add)|(Remove)', value="Add")
+                        td
+                            input.ring.form-control(type="text", name="Ring", pattern='(1.5)|(3)', value="1.5")
+                        td
+                            input.company.form-control(type='text', placeholder='Company' name='company' autocomplete="off")
+                        td
+                            input.tenantId.form-control(type="text", placeholder="Tenant ID" name="tenantId"  autocomplete="off" pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
+                        td
+                            input.name.form-control(type='text', placeholder='Name' name='name' )
+                        td
+                            input.email.form-control(type='email', placeholder='name@domain.com' name='email' )
+                        td
+                            input.objectId.form-control(type='text', placeholder='ObjectID' name='objectId' title="Please enter a valid ObjectID."  pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
+                        td
+                            input.category.form-control(name='category', list='user-category-list' )
+                            datalist#user-category-list
+                                option(value="IT Admin")
+                                option(value="Room Account")
+                                option(value="Device Account")
+                                option(value="Super User")
+                                option(value="Elite User")
+                        td
+                            span.glyphicon.glyphicon-plus.adder
+
+            h3 Tenants
+            table.table.table-striped.table-bordered#tenant-table
+                thead
+                    tr
+                        td #[strong Add/Remove]
+                        td #[strong Ring]
+                        td #[strong Tenant Name]
+                        td #[strong Domain]
+                        td #[strong TenantID]
+                        td #[strong Category]
+                        td    
+                tbody
+                    tr.form-row
+                        td
+                            input.addRemove.form-control(type='text', name="addRemove", pattern='(Add)|(Remove)', value="Add")
+                        td
+                            input.ring.form-control(type='text', name="Ring", pattern='(1.5)|(3)', value="3")
+                        td
+                            input.name.form-control(type='text', placeholder='Name' name='name' )
+                        td
+                            input.domain.form-control(type='text', placeholder='domain.onmicrosoft.com' name='domain' )
+                        td
+                            input.objectId.form-control(type='text', placeholder='Tenant OID' name='objectId' title="Please enter a valid ObjectID."  pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
+                        td
+                            input.category.form-control(name='category', list='tenant-category-list' )
+                            datalist#tenant-category-list
+                                option(value="Prod Tenant")
+                                option(value="Dev Tenant")
+                                option(value="Test Tenant")
+                        td
+                            span.glyphicon.glyphicon-plus.adder
+        .alert.alert-success(style="display: none")
+            p Your requests were submitted! You will receive a confirmation email.
+
+        .btn-container
+            button.btn.btn-teams#submitForm(type='submit' disabled) Submit
