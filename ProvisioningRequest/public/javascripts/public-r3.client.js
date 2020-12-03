@@ -1,11 +1,40 @@
 ﻿'use strict';
 
 (function () {
-    var itAdminsApiUrl = "https://tap-validation-tab-admin-2.azurewebsites.net/api/tenants/";
+    var itAdminsApiUrl = "../api/tenants/";
 
     var spinner = '<i class="fa fa-spinner fa-spin"></i>  ';
 
-    
+    function cleanEmail(email) {
+        console.log("Cleaning email");
+        console.log(email);
+
+        // Deal with undefined email
+        if (!email) {
+            return email;
+        }
+
+        email = email.toLowerCase();
+        console.log(email);
+        email = email.replace("#ext#@microsoft.onmicrosoft.com", "");
+        console.log(email);
+        if (email.includes("@")) {
+            return email;
+
+        } else if (email.includes("_")) {
+            console.log("Going the underscore route");
+            var underscoreParts = email.split("_");
+            var domain = underscoreParts.pop();
+            var tenantString = domain.split(".")[0];
+
+            if (underscoreParts.length > 1) {
+                email = underscoreParts.join("_") + "@" + domain;
+            } else {
+                email = underscoreParts[0] + "@" + domain;
+            }
+        }
+        return email;
+    }
 
     jQuery.extend(jQuery.expr[':'], {
         invalid: function (elem, index, match) {
@@ -25,10 +54,13 @@
         }
     });
     
-    const newRowHtml = '<tr class="form-row"><td><select class="addRemove form-control" name="addRemove"><option value="Add">Add</option><option value="Remove">Remove</option></select></td><td><input class="name form-control" type="text" placeholder="Name" name="name" required></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email" required></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}" required></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr><div id="next-row"';
+    const newRowHtml = '<tr class="form-row"><td><select class="addRemove form-control" name="addRemove"><option value="Add">Add</option><option value="Remove">Remove</option></select></td><td><input class="name form-control" type="text" placeholder="Name" name="name" required=""></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email" required=""></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" title="Please enter a valid ObjectID." required="" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="position form-control" type="text" placeholder="Position" name="position"></td><td><input class="department form-control" type="text" placeholder="Department" name="department"></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr>';
 
     // R3 Bulk Provisioning flow. This sends confirmation email, checks the OIDs, and sends it to the "immmediately create a PR" flow
-    var api_url = "https://prod-00.westcentralus.logic.azure.com:443/workflows/f2260dc702c04364b5e6ec2d7901db72/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=TEg-D2oPUX_eOw8WEW_cUqWmqbZ9up31Xq6_9vfp3Zk";
+    //const api_url = "https://prod-00.westcentralus.logic.azure.com:443/workflows/f2260dc702c04364b5e6ec2d7901db72/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=TEg-D2oPUX_eOw8WEW_cUqWmqbZ9up31Xq6_9vfp3Zk";
+
+    // Normal bulk provisioning flow. This writes the requests to the Provisioning Requests sheet like usual requests.
+    const api_url = "https://prod-28.westcentralus.logic.azure.com:443/workflows/b2c3172f32f44fb0bd8c0aa4d088074f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7NG895qipyLxhThbWOS8eZDioXpv_0UEZbc1s4xJNrI";
 
     var maxUsers = 50;
 
@@ -55,7 +87,7 @@
                 url: itAdminsApiUrl + tid,
                 success: function (data) {
                     $('#getR3Users').html($('#getR3Users').html().replace(spinner, ""));
-                    console.log(data);
+                    data = JSON.parse(data);
                     if (data.r3_users.length ) {
                         var adminList = data.r3_users
                         $('#r3Users').html("");
@@ -106,6 +138,8 @@
             let name = row.querySelector("input.name").value;
             let email = row.querySelector("input.email").value;
             let objectId = row.querySelector("input.objectId").value;
+            let position = row.querySelector("input.position").value;
+            let department = row.querySelector("input.department").value;
 
             microsoftTeams.getContext(function (context) {
                 let body = {
@@ -120,8 +154,18 @@
                     name: name,
                     email: email,
                     objectId: objectId,
+                    position: position,
+                    department: department,
                     category: validation,
                 }
+
+                // Trying to send email to their UPN won't work if they're a guest
+                try {
+                    body.userEmail = cleanEmail(body.userEmail);
+                } catch (e) {
+                    console.log(e);
+                }
+
                 arr.push(body);
 
                 checkIfDone(arr);
@@ -146,9 +190,23 @@
         var table = document.querySelector('table#form-table');
 
         let rows = table.querySelectorAll(".form-row");
-        console.log("Currently " + rows.length + " rows");
-        console.log("Max users: " + maxUsers);
-        if (rows.length == maxUsers) {
+        //console.log("Currently " + rows.length + " rows");
+        //console.log("Max users: " + maxUsers);
+        //console.log(rows);
+
+        let usersToAdd = 0;
+
+        rows.forEach(function (row) {
+            //console.log(row);
+            let addRemoveVal = $(row).find('.addRemove').val();
+            if (addRemoveVal == "Add") {
+                usersToAdd++;
+            } else {
+                usersToAdd--;
+            }
+        })
+        //console.log(usersToAdd + " / " + maxUsers)
+        if (usersToAdd == maxUsers) {
             $('#limitText').css('display', '');
             return;
         }
@@ -175,7 +233,7 @@
 
         // Recalculate rows to see if the adder should be removed
         rows = table.querySelectorAll(".form-row");
-        if (rows.length >= maxUsers) {
+        if (usersToAdd >= maxUsers) {
             console.log(plusButton)
             plusButton.style.display = 'none';
             $('#limitText').css('display', '');
@@ -294,33 +352,58 @@
         });
         */
 
-        $('#submitForm').prop('disabled', true);
-
-        microsoftTeams.getContext(function (context) {
-            console.log("Getting context");
-            $.ajax({
-                url: "https://tap-validation-tab.azurewebsites.net/api/tenants",
-                type: "POST",
-                data: { email: context['userPrincipalName']},
-                dataType: 'json',
-                success: function (data) {
-                    $('input.company').val(data.name);
-                    $('input.tenantId').val(data.tid);
-                    enableItAdminsLink();
-                },
-
-            });
-        });
-
-
         $.ajax({
-            url: "https://tap-validation-tab-admin-2.azurewebsites.net/api/validations",
+            url: "https://tap-validation-tab-admin-2.azurewebsites.net/api/50x50/count",
             type: "GET",
             dataType: 'json',
             success: function (data) {
-                data.forEach(function (validation) {
-                    $('#validationSelect').append("<option>" + validation.name + "</option>");
-                })
+                console.log(data.total);
+                if (data.total < 2500) {
+                    microsoftTeams.getContext(function (context) {
+                        console.log("Getting context");
+
+                        $.ajax({
+                            url: "/api/tenants",
+                            type: "POST",
+                            data: { email: context['userPrincipalName'] },
+                            dataType: 'json',
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                if (data) {
+                                    $('input.company').val(data.name);
+                                    $('input.tenantId').val(data.tid);
+                                    console.log("R3 users max is: " + data.r3_users_max);
+                                    if (data.r3_users_max) {
+                                        maxUsers = data.r3_users_max;
+                                    }
+                                    enableItAdminsLink();
+                                }
+
+                            },
+
+                        });
+                    });
+
+
+                    $.ajax({
+                        url: "https://tap-validation-tab-admin-2.azurewebsites.net/api/validations",
+                        type: "GET",
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.length > 0) {
+                                data.forEach(function (validation) {
+                                    $('#validationSelect').append("<option>" + validation.name + "</option>");
+                                })
+                            }
+                        },
+
+                    });
+                } else {
+                    console.log("Program full");
+                    $('#program-full').show();
+                    $('#form').hide();
+                    $('#submit-form').hide();
+                }
             },
 
         });

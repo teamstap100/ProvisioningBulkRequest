@@ -25,7 +25,7 @@
         }
     });
 
-    const newRowHtml = '<tr class="form-row"><td><select class="addRemove form-control" name="addRemove"><option value="Add">Add</option><option value="Remove">Remove</option></select></td><td><input class="name form-control" type="text" placeholder="Name" name="name" required></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email" required></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}" required></td><td><input class="category form-control" name="category" list="category-list" required></select></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr><div id="next-row"';
+    const newRowHtml = '<tr class="form-row"><td><select class="addRemove form-control" name="addRemove"><option value="Add">Add</option><option value="Remove">Remove</option></select></td><td><input class="name form-control" type="text" placeholder="Name" name="name" required=""></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email" required=""></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" title="Please enter a valid ObjectID." required="" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="position form-control" type="text" placeholder="Position" name="position"></td><td><input class="department form-control" type="text" placeholder="Department" name="department"></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr>';
 
     var api_url = "https://prod-28.westcentralus.logic.azure.com:443/workflows/b2c3172f32f44fb0bd8c0aa4d088074f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7NG895qipyLxhThbWOS8eZDioXpv_0UEZbc1s4xJNrI";
 
@@ -85,7 +85,8 @@
             let name = row.querySelector("input.name").value;
             let email = row.querySelector("input.email").value;
             let objectId = row.querySelector("input.objectId").value;
-            let category = row.querySelector("input.category").value;
+            let position = row.querySelector("input.position").value;
+            let department = row.querySelector("input.department").value;
 
             microsoftTeams.getContext(function (context) {
                 let body = {
@@ -100,7 +101,8 @@
                     name: name,
                     email: email,
                     objectId: objectId,
-                    category: category,
+                    position: position,
+                    department: department,
                 }
                 arr.push(body);
 

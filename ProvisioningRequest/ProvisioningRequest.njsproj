@@ -43,6 +43,7 @@
     <Compile Include="routes\index.js" />
     <Content Include="package.json" />
     <None Include="ProvisioningBulkRequest - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\ProvisioningBulkRequest - Web Deploy.pubxml" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
     <Content Include="views\internal.pug" />
@@ -53,6 +54,8 @@
     <Content Include="views\error.pug" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="public\" />
     <Folder Include="public\images\" />
     <Folder Include="public\javascripts\" />

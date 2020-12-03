@@ -12,14 +12,21 @@ block content
             table.table.table-striped.table-bordered#user-table
                 thead
                     tr
-                        td #[strong Add/Remove]
+                        td #[strong Add/Remove] 
+                            span(style="color: red") (*)
                         td(style="width: 100px") #[strong Ring]
-                        td #[strong Company]
-                        td #[strong TenantID]
-                        td #[strong User's Name]
-                        td #[strong Email]
-                        td #[strong ObjectID]
-                        td #[strong Category]
+                            span(style="color: red") (*)
+                        //td #[strong Company]
+                        td #[strong TenantID] 
+                            span(style="color: red") (*)
+                        td #[strong User's Name] 
+                        td #[strong Email] 
+                            span(style="color: red") (*)
+                        td #[strong ObjectID] 
+                            span(style="color: red") (*)
+                        td #[strong Category] 
+                        td #[strong Position] 
+                        td #[strong Department] 
                         td    
                 tbody
                     tr.form-row
@@ -27,8 +34,6 @@ block content
                             input.addRemove.form-control(type="text", name="addRemove", pattern='(Add)|(Remove)', value="Add")
                         td
                             input.ring.form-control(type="text", name="Ring", pattern='(1.5)|(3)', value="1.5")
-                        td
-                            input.company.form-control(type='text', placeholder='Company' name='company' autocomplete="off")
                         td
                             input.tenantId.form-control(type="text", placeholder="Tenant ID" name="tenantId"  autocomplete="off" pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
                         td
@@ -45,6 +50,11 @@ block content
                                 option(value="Device Account")
                                 option(value="Super User")
                                 option(value="Elite User")
+                        td
+                            input.position.form-control(type='text', placeholder='Position', name='position')
+                        td
+                            input.department.form-control(type='text', placeholder='Department', name='department')
+
                         td
                             span.glyphicon.glyphicon-plus.adder
 

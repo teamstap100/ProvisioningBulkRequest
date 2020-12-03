@@ -5,6 +5,13 @@
 
     microsoftTeams.initialize();
 
+    var submitterEmail = "?";
+
+    microsoftTeams.getContext(function (context) {
+        console.log("Got Teams context");
+        submitterEmail = context["userPrincipalName"];
+    });
+
     jQuery.extend(jQuery.expr[':'], {
         invalid: function (elem, index, match) {
             var invalids = document.querySelectorAll(':invalid'),
@@ -50,7 +57,9 @@
         }
     });
 
-    const userRowHtml = '<tr class="form-row"><td><input class="addRemove form-control" type="text" name="addRemove" pattern="(Add)|(Remove)"></td><td><input class="ring form-control" type="text" name="Ring" pattern="(1.5)|(3)"></td><td><input class="company form-control" type="text" placeholder="Company" name="company" autocomplete="off"></td><td><input class="tenantId form-control" type="text" placeholder="Tenant ID" name="tenantId" autocomplete="off" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="name form-control" type="text" placeholder="Name" name="name"></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email"></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" title="Please enter a valid ObjectID." pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="category form-control" name="category" list="user-category-list"><datalist id="user-category-list"><option value="IT Admin"></option><option value="Room Account"></option><option value="Device Account"></option><option value="Super User"></option><option value="Elite User"></option></datalist></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr>';
+    //const userRowHtml = '<tr class="form-row"><td><input class="addRemove form-control" type="text" name="addRemove" pattern="(Add)|(Remove)"></td><td><input class="ring form-control" type="text" name="Ring" pattern="(1.5)|(3)"></td><td><input class="company form-control" type="text" placeholder="Company" name="company" autocomplete="off"></td><td><input class="tenantId form-control" type="text" placeholder="Tenant ID" name="tenantId" autocomplete="off" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="name form-control" type="text" placeholder="Name" name="name"></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email"></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" title="Please enter a valid ObjectID." pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="category form-control" name="category" list="user-category-list"><datalist id="user-category-list"><option value="IT Admin"></option><option value="Room Account"></option><option value="Device Account"></option><option value="Super User"></option><option value="Elite User"></option></datalist></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr>';
+
+    const userRowHtml = '<tr class="form-row"><td><input class="addRemove form-control" type="text" name="addRemove" pattern="(Add)|(Remove)" value="Add"></td><td><input class="ring form-control" type="text" name="Ring" pattern="(1.5)|(3)" value="1.5"></td><td><input class="tenantId form-control" type="text" placeholder="Tenant ID" name="tenantId" autocomplete="off" pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="name form-control" type="text" placeholder="Name" name="name"></td><td><input class="email form-control" type="email" placeholder="name@domain.com" name="email"></td><td><input class="objectId form-control" type="text" placeholder="ObjectID" name="objectId" title="Please enter a valid ObjectID." pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="category form-control" name="category" list="user-category-list"><datalist id="user-category-list"><option value="IT Admin"></option><option value="Room Account"></option><option value="Device Account"></option><option value="Super User"></option><option value="Elite User"></option></datalist></td><td><input class="position form-control" type="text" placeholder="Position" name="position"></td><td><input class="department form-control" type="text" placeholder="Department" name="department"></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr>';
 
     const tenantRowHtml = '<tr class="form-row"><td><input class="addRemove form-control" type="text" name="addRemove" pattern="(Add)|(Remove)"></td><td><input class="ring form-control" type="text" name="Ring" pattern="(1.5)|(3)"></td><td><input class="name form-control" type="text" placeholder="Name" name="name"></td><td><input class="domain form-control" type="text" placeholder="domain.onmicrosoft.com" name="domain"></td><td><input class="objectId form-control" type="text" placeholder="Tenant OID" name="objectId" title="Please enter a valid ObjectID." pattern="([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}"></td><td><input class="category form-control" name="category" list="tenant-category-list"><datalist id="tenant-category-list"><option value="Prod Tenant"></option><option value="Dev Tenant"></option><option value="Test Tenant"></option></datalist></td><td><span class="glyphicon glyphicon-plus adder"></span></td></tr>';
 
@@ -87,41 +96,46 @@
 
             let addRemove = row.querySelector("input.addRemove").value;
             let ring = row.querySelector("input.ring").value;
-            let company = row.querySelector("input.company").value;
+            //let company = row.querySelector("input.company").value;
             let tenantId = row.querySelector("input.tenantId").value;
             let name = row.querySelector("input.name").value;
             let email = row.querySelector("input.email").value;
             let objectId = row.querySelector("input.objectId").value;
             let category = row.querySelector("input.category").value;
+            let position = row.querySelector("input.position").value;
+            let department = row.querySelector("input.department").value;
 
             // Make sure the really important ones are filled in
-            if ((objectId == "") || (addRemove == "") || (ring == "")) {
+            if ((objectId == "") || (addRemove == "") || (ring == "") || (tenantId == "") || (email == "")) {
                 console.log("This one is missing something important");
                 done += 1;
                 console.log("Done incremented, user failure");
                 checkIfDone();
             } else {
-                microsoftTeams.getContext(function (context) {
-                    let body = {
-                        company: company,
-                        tenantId: tenantId,
-                        userEmail: context["userPrincipalName"],
+                let body = {
+                    //company: company,
+                    tenantId: tenantId,
+                    userEmail: submitterEmail,
 
-                        userOrTenant: "User",
-                        ring: ring,
+                    userOrTenant: "User",
+                    ring: ring,
 
-                        addRemove: addRemove,
-                        name: name,
-                        email: email,
-                        objectId: objectId,
-                        category: category,
-                    }
-                    arr.push(body);
-                    done += 1;
+                    addRemove: addRemove,
+                    name: name,
+                    email: email,
+                    objectId: objectId,
+                    category: category,
+                    position: position,
+                    department: department,
+                }
+
+                console.log(body);
+
+                arr.push(body);
+                done += 1;
                     
-                    console.log("Done incremented, user success");
-                    checkIfDone();
-                });
+                console.log("Done incremented, user success");
+                checkIfDone();
             }
         });
 
@@ -143,26 +157,24 @@
                 console.log("Done incremented, tenant failure");
                 checkIfDone();
             } else {
-                microsoftTeams.getContext(function (context) {
-                    let body = {
-                        company: "",
-                        tenantId: "",
-                        userEmail: context["userPrincipalName"],
+                let body = {
+                    company: "",
+                    tenantId: "",
+                    userEmail: submitterEmail,
 
-                        userOrTenant: "Tenant",
-                        ring: ring,
+                    userOrTenant: "Tenant",
+                    ring: ring,
 
-                        addRemove: addRemove,
-                        name: name,
-                        email: domain,
-                        objectId: objectId,
-                        category: category
-                    }
-                    arr.push(body);
-                    done += 1;
-                    console.log("Done incremented, tenant success");
-                    checkIfDone();
-                });
+                    addRemove: addRemove,
+                    name: name,
+                    email: domain,
+                    objectId: objectId,
+                    category: category
+                }
+                arr.push(body);
+                done += 1;
+                console.log("Done incremented, tenant success");
+                checkIfDone();
             }
         });
 
@@ -214,12 +226,14 @@
         // Add excelPaste handlers to the pastable fields
         newRow.querySelector('input.addRemove').addEventListener('paste', excelPaste);
         newRow.querySelector('input.ring').addEventListener('paste', excelPaste);
-        newRow.querySelector('input.company').addEventListener('paste', excelPaste);
+        //newRow.querySelector('input.company').addEventListener('paste', excelPaste);
         newRow.querySelector('input.tenantId').addEventListener('paste', excelPaste);
         newRow.querySelector('input.name').addEventListener('paste', excelPaste);
         newRow.querySelector('input.email').addEventListener('paste', excelPaste);
         newRow.querySelector('input.objectId').addEventListener('paste', excelPaste);
         newRow.querySelector('input.category').addEventListener('paste', excelPaste);
+        newRow.querySelector('input.position').addEventListener('paste', excelPaste);
+        newRow.querySelector('input.department').addEventListener('paste', excelPaste);
 
         newRow.querySelector('input.addRemove').value = lastAddRemove;
         newRow.querySelector('input.ring').value = lastRing;
@@ -349,12 +363,14 @@
 
         userTable.querySelector('input.addRemove').addEventListener('paste', excelPaste);
         userTable.querySelector('input.ring').addEventListener('paste', excelPaste);
-        userTable.querySelector('input.company').addEventListener('paste', excelPaste);
+        //userTable.querySelector('input.company').addEventListener('paste', excelPaste);
         userTable.querySelector('input.tenantId').addEventListener('paste', excelPaste);
         userTable.querySelector('input.name.form-control').addEventListener('paste', excelPaste);
         userTable.querySelector('input.email.form-control').addEventListener('paste', excelPaste);
         userTable.querySelector('input.objectId').addEventListener('paste', excelPaste);
         userTable.querySelector('input.category').addEventListener('paste', excelPaste);
+        userTable.querySelector('input.position').addEventListener('paste', excelPaste);
+        userTable.querySelector('input.department').addEventListener('paste', excelPaste);
 
         tenantTable.querySelector('input.addRemove').addEventListener('paste', excelPaste);
         tenantTable.querySelector('input.ring').addEventListener('paste', excelPaste);

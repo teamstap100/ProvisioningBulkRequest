@@ -2,7 +2,7 @@
 
 (function () {
     // Test
-    var contentUrl = "https://069ee839.ngrok.io/";
+    var contentUrl = "https://taptools.ngrok.io/";
 
     // Prod
     //var contentUrl = "https://provisioningbulkrequest.azurewebsites.net/"

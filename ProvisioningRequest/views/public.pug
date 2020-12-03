@@ -46,7 +46,8 @@ block content
                         td #[strong User's Name]
                         td #[strong Email]
                         td #[strong ObjectID]
-                        td #[strong Category]
+                        td #[strong Position]
+                        td #[strong Department]
                         td    
                 tbody
                     tr.form-row
@@ -61,13 +62,9 @@ block content
                         td
                             input.objectId.form-control(type='text', placeholder='ObjectID' name='objectId' title="Please enter a valid ObjectID." required pattern='([a-f]|[0-9]){8}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){4}-([a-f]|[0-9]){12}')
                         td
-                            input.category.form-control(name='category', list='category-list' required)
-                            datalist#category-list
-                                option(value="IT Admin")
-                                option(value="Room Account")
-                                option(value="Device Account")
-                                option(value="Super User")
-                                option(value="Elite User")
+                            input.position.form-control(type='text', placeholder='Position' name='position')
+                        td
+                            input.department.form-control(type='text', placeholder='Department' name='department')
                         td
                             span.glyphicon.glyphicon-plus.adder
         .alert.alert-success(style="display: none")
