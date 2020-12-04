@@ -5,6 +5,37 @@ var router = express.Router();
 
 let auth = process.env["TVT_API_KEY"];
 
+function cleanEmail(email) {
+    console.log("Cleaning email");
+    console.log(email);
+
+    // Deal with undefined email
+    if (!email) {
+        return email;
+    }
+
+    email = email.toLowerCase();
+    console.log(email);
+    email = email.replace("#ext#@microsoft.onmicrosoft.com", "");
+    console.log(email);
+    if (email.includes("@")) {
+        return email;
+
+    } else if (email.includes("_")) {
+        console.log("Going the underscore route");
+        var underscoreParts = email.split("_");
+        var domain = underscoreParts.pop();
+        var tenantString = domain.split(".")[0];
+
+        if (underscoreParts.length > 1) {
+            email = underscoreParts.join("_") + "@" + domain;
+        } else {
+            email = underscoreParts[0] + "@" + domain;
+        }
+    }
+    return email;
+}
+
 /* GET home page. */
 router.get('/', function (req, res) {
     res.render('public', { title: 'TAP Provisioning - R1.5' });
@@ -24,10 +55,11 @@ router.get('/config', function (req, res) {
 
 router.post("/api/tenants", function (req, res) {
     console.log(req.body);
-    console.log("Not yet implemented");
+
+    let userEmail = cleanEmail(req.body.email);
 
     let tenantInfoParams = {
-        url: "https://tap-validation-tab-admin-2.azurewebsites.net/api/tenants/email/" + req.body.email,
+        url: "https://tap-validation-tab-admin-2.azurewebsites.net/api/tenants/email/" + userEmail,
         headers: {
             'X-API-KEY': auth
         }

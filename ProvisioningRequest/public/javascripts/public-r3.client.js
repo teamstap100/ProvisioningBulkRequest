@@ -362,13 +362,16 @@
                     microsoftTeams.getContext(function (context) {
                         console.log("Getting context");
 
+                        let userEmail = context['userPrincipalName'];
+
                         $.ajax({
                             url: "/api/tenants",
                             type: "POST",
-                            data: { email: context['userPrincipalName'] },
+                            data: { email: userEmail },
                             dataType: 'json',
                             success: function (data) {
                                 data = JSON.parse(data);
+                                console.log(data);
                                 if (data) {
                                     $('input.company').val(data.name);
                                     $('input.tenantId').val(data.tid);
